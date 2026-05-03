@@ -1,0 +1,33 @@
+{
+  "movies": [
+    {"title": "Avatar", "budget": 237000000, "revenue": 2787965087, "popularity": 129.4, "runtime": 162, "genre": "Action, Adventure, Fantasy"},
+    {"title": "Pirates of the Caribbean: At World's End", "budget": 300000000, "revenue": 961000000, "popularity": 85.2, "runtime": 169, "genre": "Adventure, Action, Fantasy"},
+    {"title": "Spectre", "budget": 245000000, "revenue": 880674609, "popularity": 76.3, "runtime": 148, "genre": "Action, Adventure, Crime"},
+    {"title": "The Dark Knight Rises", "budget": 250000000, "revenue": 1084939099, "popularity": 112.5, "runtime": 165, "genre": "Action, Crime, Drama"},
+    {"title": "John Carter", "budget": 260000000, "revenue": 284139100, "popularity": 45.8, "runtime": 132, "genre": "Action, Adventure, Sci-Fi"},
+    {"title": "Spider-Man 3", "budget": 258000000, "revenue": 890871626, "popularity": 98.7, "runtime": 139, "genre": "Action, Adventure, Fantasy"},
+    {"title": "Tangled", "budget": 260000000, "revenue": 591794936, "popularity": 89.4, "runtime": 100, "genre": "Animation, Family, Comedy"},
+    {"title": "Avengers: Age of Ultron", "budget": 280000000, "revenue": 1405403694, "popularity": 134.2, "runtime": 141, "genre": "Action, Adventure, Sci-Fi"},
+    {"title": "Jurassic World", "budget": 150000000, "revenue": 1670400637, "popularity": 156.8, "runtime": 124, "genre": "Action, Adventure, Sci-Fi"},
+    {"title": "Interstellar", "budget": 165000000, "revenue": 677471339, "popularity": 142.3, "runtime": 169, "genre": "Adventure, Drama, Sci-Fi"},
+    {"title": "The Lion King", "budget": 150000000, "revenue": 968483777, "popularity": 118.9, "runtime": 88, "genre": "Family, Animation, Drama"},
+    {"title": "Frozen", "budget": 150000000, "revenue": 1274219009, "popularity": 145.6, "runtime": 102, "genre": "Animation, Family, Adventure"},
+    {"title": "Iron Man 3", "budget": 200000000, "revenue": 1214811252, "popularity": 121.4, "runtime": 130, "genre": "Action, Adventure, Sci-Fi"},
+    {"title": "Minions", "budget": 74000000, "revenue": 1159398397, "popularity": 138.7, "runtime": 91, "genre": "Animation, Family, Comedy"},
+    {"title": "Captain America: Civil War", "budget": 250000000, "revenue": 1153304495, "popularity": 128.5, "runtime": 147, "genre": "Action, Adventure, Sci-Fi"},
+    {"title": "Transformers: Dark of the Moon", "budget": 195000000, "revenue": 1123794079, "popularity": 94.2, "runtime": 154, "genre": "Action, Adventure, Sci-Fi"},
+    {"title": "Skyfall", "budget": 200000000, "revenue": 1108561013, "popularity": 107.8, "runtime": 143, "genre": "Action, Adventure, Thriller"},
+    {"title": "The Amazing Spider-Man", "budget": 230000000, "revenue": 757930663, "popularity": 88.3, "runtime": 136, "genre": "Action, Adventure, Fantasy"},
+    {"title": "Shrek 2", "budget": 150000000, "revenue": 919838758, "popularity": 92.1, "runtime": 93, "genre": "Animation, Family, Comedy"},
+    {"title": "Harry Potter and the Half-Blood Prince", "budget": 250000000, "revenue": 934416487, "popularity": 101.5, "runtime": 153, "genre": "Adventure, Family, Fantasy"}
+  ],
+  "statistics": {
+    "total_movies": 20,
+    "avg_budget": 207350000,
+    "avg_revenue": 1040968571,
+    "avg_runtime": 132,
+    "top_genre": "Action, Adventure, Sci-Fi",
+    "highest_grossing": "Avatar",
+    "most_expensive": "Pirates of the Caribbean: At World's End"
+  }
+}

@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Box Office Analysis Dashboard</title>
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card h3 {
+            color: #667eea;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-card .value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .chart-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .chart-card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.4em;
+            text-align: center;
+        }
+
+        .table-container {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow-x: auto;
+        }
+
+        .table-container h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.4em;
+            text-align: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85em;
+            letter-spacing: 1px;
+        }
+
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .revenue {
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .budget {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .profit {
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .loss {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        footer {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+            padding: 20px;
+            opacity: 0.8;
+        }
+
+        .loading {
+            text-align: center;
+            color: white;
+            font-size: 1.5em;
+            padding: 50px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎬 Box Office Analysis Dashboard</h1>
+            <p>Interactive visualization of movie performance metrics</p>
+        </header>
+
+        <div id="loading" class="loading">Loading data...</div>
+
+        <div id="content" style="display: none;">
+            <div class="stats-grid" id="statsGrid"></div>
+            
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <h2>Budget vs Revenue</h2>
+                    <div id="scatterChart"></div>
+                </div>
+                
+                <div class="chart-card">
+                    <h2>Top 10 Movies by Revenue</h2>
+                    <div id="barChart"></div>
+                </div>
+                
+                <div class="chart-card">
+                    <h2>Revenue Distribution by Genre</h2>
+                    <div id="pieChart"></div>
+                </div>
+                
+                <div class="chart-card">
+                    <h2>Popularity vs Runtime</h2>
+                    <div id="bubbleChart"></div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <h2>Movie Details</h2>
+                <table id="movieTable">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Genre</th>
+                            <th>Budget</th>
+                            <th>Revenue</th>
+                            <th>Profit/Loss</th>
+                            <th>Popularity</th>
+                            <th>Runtime (min)</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <footer>
+            <p>Created with Plotly.js | Data from TMDB Box Office Prediction</p>
+        </footer>
+    </div>
+
+    <script>
+        // Format currency
+        function formatCurrency(num) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(num);
+        }
+
+        // Format number with commas
+        function formatNumber(num) {
+            return new Intl.NumberFormat('en-US').format(num);
+        }
+
+        // Load and process data
+        async function loadData() {
+            try {
+                const response = await fetch('data/movies.json');
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error('Error loading data:', error);
+                alert('Error loading data. Please make sure movies.json exists in the data folder.');
+                return null;
+            }
+        }
+
+        // Create statistics cards
+        function createStatsCards(statistics) {
+            const statsGrid = document.getElementById('statsGrid');
+            const stats = [
+                { label: 'Total Movies', value: statistics.total_movies },
+                { label: 'Avg Budget', value: formatCurrency(statistics.avg_budget) },
+                { label: 'Avg Revenue', value: formatCurrency(statistics.avg_revenue) },
+                { label: 'Avg Runtime', value: `${statistics.avg_runtime} min` },
+                { label: 'Highest Grossing', value: statistics.highest_grossing },
+                { label: 'Most Expensive', value: statistics.most_expensive.split(':')[0] }
+            ];
+
+            stats.forEach(stat => {
+                const card = document.createElement('div');
+                card.className = 'stat-card';
+                card.innerHTML = `
+                    <h3>${stat.label}</h3>
+                    <div class="value">${stat.value}</div>
+                `;
+                statsGrid.appendChild(card);
+            });
+        }
+
+        // Create scatter plot (Budget vs Revenue)
+        function createScatterChart(movies) {
+            const trace = {
+                x: movies.map(m => m.budget),
+                y: movies.map(m => m.revenue),
+                mode: 'markers+text',
+                type: 'scatter',
+                text: movies.map(m => m.title),
+                textposition: 'top center',
+                marker: {
+                    size: 12,
+                    color: movies.map(m => m.popularity),
+                    colorscale: 'Viridis',
+                    showscale: true,
+                    colorbar: { title: 'Popularity' }
+                }
+            };
+
+            const layout = {
+                title: 'Budget vs Revenue (Color = Popularity)',
+                xaxis: { title: 'Budget ($)', tickformat: '$.2s' },
+                yaxis: { title: 'Revenue ($)', tickformat: '$.2s' },
+                hovermode: 'closest',
+                height: 400,
+                margin: { t: 50, b: 50, l: 80, r: 20 }
+            };
+
+            Plotly.newPlot('scatterChart', [trace], layout, {responsive: true});
+        }
+
+        // Create bar chart (Top 10 by Revenue)
+        function createBarChart(movies) {
+            const sorted = [...movies].sort((a, b) => b.revenue - a.revenue).slice(0, 10);
+            
+            const trace = {
+                x: sorted.map(m => m.revenue),
+                y: sorted.map(m => m.title),
+                type: 'bar',
+                orientation: 'h',
+                marker: {
+                    color: sorted.map(m => m.revenue),
+                    colorscale: 'Blues'
+                }
+            };
+
+            const layout = {
+                title: 'Top 10 Highest Grossing Movies',
+                xaxis: { title: 'Revenue ($)', tickformat: '$.2s' },
+                yaxis: { title: '' },
+                height: 400,
+                margin: { t: 50, b: 50, l: 300, r: 20 }
+            };
+
+            Plotly.newPlot('barChart', [trace], layout, {responsive: true});
+        }
+
+        // Create pie chart (Revenue by Genre)
+        function createPieChart(movies) {
+            const genreRevenue = {};
+            movies.forEach(movie => {
+                const genres = movie.genre.split(',').map(g => g.trim());
+                genres.forEach(genre => {
+                    if (!genreRevenue[genre]) genreRevenue[genre] = 0;
+                    genreRevenue[genre] += movie.revenue / genres.length;
+                });
+            });
+
+            const labels = Object.keys(genreRevenue);
+            const values = Object.values(genreRevenue);
+
+            const trace = {
+                labels: labels,
+                values: values,
+                type: 'pie',
+                hole: 0.4,
+                marker: {
+                    colors: ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe', '#00f2fe', '#43e97b', '#38f9d7']
+                }
+            };
+
+            const layout = {
+                title: 'Revenue Distribution by Genre',
+                height: 400,
+                margin: { t: 50, b: 20, l: 20, r: 20 }
+            };
+
+            Plotly.newPlot('pieChart', [trace], layout, {responsive: true});
+        }
+
+        // Create bubble chart (Popularity vs Runtime)
+        function createBubbleChart(movies) {
+            const trace = {
+                x: movies.map(m => m.runtime),
+                y: movies.map(m => m.popularity),
+                mode: 'markers+text',
+                type: 'scatter',
+                text: movies.map(m => m.title),
+                textposition: 'top center',
+                marker: {
+                    size: movies.map(m => Math.sqrt(m.revenue) / 10000),
+                    color: movies.map(m => m.budget),
+                    colorscale: 'Reds',
+                    showscale: true,
+                    colorbar: { title: 'Budget' }
+                }
+            };
+
+            const layout = {
+                title: 'Popularity vs Runtime (Size = Revenue, Color = Budget)',
+                xaxis: { title: 'Runtime (minutes)' },
+                yaxis: { title: 'Popularity Score' },
+                hovermode: 'closest',
+                height: 400,
+                margin: { t: 50, b: 50, l: 80, r: 20 }
+            };
+
+            Plotly.newPlot('bubbleChart', [trace], layout, {responsive: true});
+        }
+
+        // Create data table
+        function createTable(movies) {
+            const tbody = document.querySelector('#movieTable tbody');
+            
+            movies.forEach(movie => {
+                const profit = movie.revenue - movie.budget;
+                const profitClass = profit >= 0 ? 'profit' : 'loss';
+                const profitText = profit >= 0 ? `+${formatCurrency(profit)}` : formatCurrency(profit);
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><strong>${movie.title}</strong></td>
+                    <td>${movie.genre}</td>
+                    <td class="budget">${formatCurrency(movie.budget)}</td>
+                    <td class="revenue">${formatCurrency(movie.revenue)}</td>
+                    <td class="${profitClass}">${profitText}</td>
+                    <td>${movie.popularity.toFixed(1)}</td>
+                    <td>${movie.runtime}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Initialize dashboard
+        async function init() {
+            const data = await loadData();
+            
+            if (!data) {
+                document.getElementById('loading').textContent = 'Error loading data!';
+                return;
+            }
+
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('content').style.display = 'block';
+
+            createStatsCards(data.statistics);
+            createScatterChart(data.movies);
+            createBarChart(data.movies);
+            createPieChart(data.movies);
+            createBubbleChart(data.movies);
+            createTable(data.movies);
+        }
+
+        // Start the app
+        init();
+    </script>
+</body>
+</html>
